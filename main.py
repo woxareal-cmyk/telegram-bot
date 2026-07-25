@@ -13,6 +13,7 @@ from aiogram.types import (
     LabeledPrice, PreCheckoutQuery
 )
 from deep_translator import GoogleTranslator
+from aiohttp import web
 
 # gTTS uchun xavfsiz import
 try:
@@ -24,7 +25,6 @@ import g4f
 
 # API Tokenlar
 BOT_TOKEN = "8633962524:AAEY7hxR2_bCmdE7SDM7hT58KvYCpJ3Gbto"
-# BotFather'dan olingan Click provider tokeni (Masalan: 398061625:TEST:...)
 PAYMENT_PROVIDER_TOKEN = "YOUR_CLICK_PROVIDER_TOKEN"
 
 logging.basicConfig(level=logging.INFO)
@@ -197,15 +197,7 @@ async def start_quiz(message: Message):
     quiz_count = row[1] if row and row[1] is not None else 0
     is_pro = row[2] if row else 0
 
-    if days < 5 and not is_pro:
-        await message.answer(
-            f"🔒 <b>Kunlik Quiz hali yopiq!</b>\n\n"
-            f"Quizda qatnashish uchun botdan kamida <b>5 kun</b> foydalanishingiz kerak.\n"
-            f"Sizning hozirgi faolligingiz: <b>{days}/5 kun</b>\n\n"
-            f"💡 <i>PRO a'zolar uchun testlar birinchi kundanoq ochiq!</i>",
-            parse_mode="HTML"
-        )
-        return
+    # 5 kunlik cheklov olib tashlandi, endi hamma 1-kundanoq quiz ishlay oladi!
 
     if quiz_count >= 15 and not is_pro:
         await message.answer(
@@ -556,47 +548,25 @@ async def general_message_handler(message: Message):
             await wait_msg.delete()
             await message.answer("❌ Tarjimada xatolik yuz berdi.")
 
-async def main():
-    await dp.start_polling(bot)
-
-if __name__ == "__main__":
-    asyncio.run(main())
-    import asyncio
-import os
-from aiogram import Bot, Dispatcher
-from aiohttp import web
-
-# Telegram botingiz obyektlari (o'zingizniki bo'yicha)
-TOKEN = "8633962524:AAEY7hxR2_bCmdE7SDM7hT58KvYCpJ3Gbto"
-bot = Bot(token=TOKEN)
-dp = Dispatcher()
-
-
-# Render talab qiladigan port (veb-server)
+# --- RENDER UCHUN SOXTA VEB-SERVER ---
 async def handle(request):
     return web.Response(text="Bot faol ishlayapti!")
-
 
 async def start_dummy_server():
     app = web.Application()
     app.router.add_get("/", handle)
     runner = web.AppRunner(app)
     await runner.setup()
-
-    # Render beradigan PORT hisoblanadi
     port = int(os.environ.get("PORT", 8080))
     site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
 
-
-# Asosiy ishga tushirish qismi
 async def main():
-    # Render uchun port serverni yurgizamiz
+    # Render port xatosini oldini olish uchun soxta veb-serverni yuritamiz
     await start_dummy_server()
-
+    
     # Telegram bot polling'ni yurgizamiz
     await dp.start_polling(bot)
-
 
 if __name__ == "__main__":
     asyncio.run(main())
