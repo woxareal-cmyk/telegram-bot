@@ -561,3 +561,42 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+    import asyncio
+import os
+from aiogram import Bot, Dispatcher
+from aiohttp import web
+
+# Telegram botingiz obyektlari (o'zingizniki bo'yicha)
+TOKEN = "BOT_TOKENINGIZ"
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
+
+
+# Render talab qiladigan port (veb-server)
+async def handle(request):
+    return web.Response(text="Bot faol ishlayapti!")
+
+
+async def start_dummy_server():
+    app = web.Application()
+    app.router.add_get("/", handle)
+    runner = web.AppRunner(app)
+    await runner.setup()
+
+    # Render beradigan PORT hisoblanadi
+    port = int(os.environ.get("PORT", 8080))
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+
+
+# Asosiy ishga tushirish qismi
+async def main():
+    # Render uchun port serverni yurgizamiz
+    await start_dummy_server()
+
+    # Telegram bot polling'ni yurgizamiz
+    await dp.start_polling(bot)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
