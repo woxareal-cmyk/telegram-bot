@@ -567,7 +567,7 @@ from aiogram import Bot, Dispatcher
 from aiohttp import web
 
 # Telegram botingiz obyektlari (o'zingizniki bo'yicha)
-TOKEN = "BOT_TOKENINGIZ"
+TOKEN = "8633962524:AAEY7hxR2_bCmdE7SDM7hT58KvYCpJ3Gbto"
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
